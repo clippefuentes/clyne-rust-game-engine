@@ -3,19 +3,20 @@
 use rusty_engine::prelude::*;
 
 struct GameState {
-    high_score: u32,
+    // high_score: u32,
     current_score: u32,
-    enemy_labels: Vec<String>,
-    spawn_timer: Timer,
+    // enemy_labels: Vec<String>,
+    ferris_index: i32,
+    // spawn_timer: Timer,
 }
 
 impl Default for GameState {
     fn default() -> Self {
         Self {
-            high_score: 0,
+            // high_score: 0,
             current_score: 0,
-            enemy_labels: Vec::new(),
-            spawn_timer: Timer::from_seconds(1.0, false), 
+            ferris_index: 0,
+            // spawn_timer: Timer::from_seconds(1.0, false), 
         }
     }
 }
@@ -29,10 +30,6 @@ fn main() {
     player.rotation = SOUTH_WEST;
     player.scale = 1.0;
     player.collision = true;
-
-    let car1 = game.add_sprite("car1", SpritePreset::RacingCarYellow);
-    car1.translation = Vec2::new(300.0, 0.0);
-    car1.collision = true;
 
     game.add_logic(game_logic);
     game.run(GameState::default());
@@ -78,5 +75,17 @@ fn game_logic(engine: &mut Engine, game_state: &mut GameState) {
         .pressed_any(&[KeyCode::Left, KeyCode::A]) 
     {
         player.translation.x -= MOVEMENT_SPEED * engine.delta_f32;
+    }
+
+    // handle mouse input
+
+    if engine.mouse_state.just_pressed(MouseButton::Left) {
+        if let Some(mouse_location) = engine.mouse_state.location() {
+            let label = format!("ferris{}", game_state.ferris_index);
+            game_state.ferris_index += 1;
+            let car1 = engine.add_sprite(label.clone(), SpritePreset::RacingCarYellow);
+            car1.translation = mouse_location;
+            car1.collision = true;
+        }
     }
 }
