@@ -1,13 +1,14 @@
 // use std::thread::__FastLocalKeyInner;
 
 use rusty_engine::prelude::*;
+use rand::prelude::*;
 
 struct GameState {
     high_score: u32,
     score: u32,
     // enemy_labels: Vec<String>,
     ferris_index: i32,
-    // spawn_timer: Timer,
+    spawn_timer: Timer,
 }
 
 impl Default for GameState {
@@ -16,7 +17,7 @@ impl Default for GameState {
             high_score: 0,
             score: 0,
             ferris_index: 0,
-            // spawn_timer: Timer::from_seconds(1.0, false),
+            spawn_timer: Timer::from_seconds(2.0, true),
         }
     }
 }
@@ -62,13 +63,13 @@ fn game_logic(engine: &mut Engine, game_state: &mut GameState) {
                 let high_score = engine.texts.get_mut("high_score").unwrap();
                 high_score.value = format!("High score: {}", game_state.high_score);
             }
-            engine.audio_manager.play_sfx(SfxPreset::Minimize1, 0.1);
+            engine.audio_manager.play_sfx(SfxPreset::Minimize1, 0.5);
         }
     }
 
     let player = engine.sprites.get_mut("player").unwrap();
     // player.translation.x += 100.0 * engine.delta_f32;
-    const MOVEMENT_SPEED: f32 = 100.0;
+    const MOVEMENT_SPEED: f32 = 300.0;
     if engine
         .keyboard_state
         .pressed_any(&[KeyCode::Up, KeyCode::W])
@@ -104,6 +105,15 @@ fn game_logic(engine: &mut Engine, game_state: &mut GameState) {
             car1.translation = mouse_location;
             car1.collision = true;
         }
+    }
+
+    if game_state.spawn_timer.tick(engine.delta).just_finished() {
+        let label = format!("ferris{}", game_state.ferris_index);
+        game_state.ferris_index += 1;
+        let car1 = engine.add_sprite(label.clone(), SpritePreset::RacingCarYellow);
+        car1.translation.x = thread_rng().gen_range(-550.0..550.0);
+        car1.translation.y = thread_rng().gen_range(-325.0..325.0);
+        car1.collision = true;
     }
 
     if engine.keyboard_state.just_pressed(KeyCode::R) {
