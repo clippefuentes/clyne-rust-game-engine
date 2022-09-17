@@ -69,7 +69,7 @@ fn game_logic(engine: &mut Engine, game_state: &mut GameState) {
 
     let player = engine.sprites.get_mut("player").unwrap();
     // player.translation.x += 100.0 * engine.delta_f32;
-    const MOVEMENT_SPEED: f32 = 300.0;
+    const MOVEMENT_SPEED: f32 = 350.0;
     if engine
         .keyboard_state
         .pressed_any(&[KeyCode::Up, KeyCode::W])
